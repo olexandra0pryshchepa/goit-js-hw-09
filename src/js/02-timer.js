@@ -22,9 +22,10 @@ function startCountdown(targetDate) {
 
     if (timeRemaining <= 0) {
       clearInterval(countdownInterval);
-      updateTimeDisplay(0);
+      const time = { days: 0, hours: 0, minutes: 0, seconds: 0 };
+      updateTimeDisplay(time);
       window.alert("Time's up!");
-      buttonStart.removeAttribute("disabled");
+      
     } else {
       const time = convertMs(timeRemaining);
       updateTimeDisplay(time);
@@ -57,6 +58,31 @@ function addLeadingZero(value) {
   return String(value).padStart(2, "0");
 }
 
+
+buttonStart.setAttribute("disabled", "true");
+
+const options = {
+  enableTime: true,
+  time_24hr: true,
+  defaultDate: new Date(),
+  minuteIncrement: 1,
+  onClose(selectedDates) {
+    const selectedDate = selectedDates[0];
+    if (selectedDate) {
+      if (selectedDate > new Date()) {
+        buttonStart.removeAttribute("disabled");
+      } else {
+        Notiflix.Notify.failure("Please choose a date in the future");
+        buttonStart.setAttribute("disabled", "true");
+      }
+    } else {
+      buttonStart.setAttribute("disabled", "true");
+    }
+  },
+};
+
+flatpickr(dateInput, options);
+
 buttonStart.addEventListener("click", () => {
   const selectedDate = new Date(dateInput.value);
   if (!isNaN(selectedDate.getTime())) {
@@ -67,13 +93,3 @@ buttonStart.addEventListener("click", () => {
     }
   }
 });
-
-
-const options = {
-  enableTime: true,
-  time_24hr: true,
-  defaultDate: new Date(),
-  minuteIncrement: 1,
-};
-
-flatpickr(dateInput, options);
